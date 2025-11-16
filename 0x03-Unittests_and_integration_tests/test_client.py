@@ -3,7 +3,6 @@
 
 import unittest
 import requests
-from unittest import TestCase
 from unittest.mock import patch, PropertyMock, Mock
 from parameterized import parameterized, parameterized_class
 
@@ -89,7 +88,7 @@ class TestGithubOrgClient(unittest.TestCase):
     ("org_payload", "repos_payload", "expected_repos", "apache2_repos"),
     [(org_payload, repos_payload, expected_repos, apache2_repos)]
 )
-class TestIntegrationGithubOrgClient(TestCase):
+class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration tests for GithubOrgClient.public_repos"""
 
     @classmethod
