@@ -42,7 +42,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
         # Patch GithubOrgClient.org as a property
         with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
-            mock_org.return_value = mocked_org_payload
+            mock_org.return_value = mocked_payload
 
             client = GithubOrgClient("test")
             result = client._public_repos_url
