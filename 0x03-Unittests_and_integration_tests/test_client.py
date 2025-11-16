@@ -96,12 +96,11 @@ class TestIntegrationGithubOrgClient(TestCase):
         cls.get_patcher = patch("requests.get")
         cls.mock_get = cls.get_patcher.start()
 
-        # side_effect function to return different payloads based on URL
         def side_effect(url, *args, **kwargs):
             mock_response = Mock()
             if url == f"https://api.github.com/orgs/{cls.org_payload['login']}":
                 mock_response.json.return_value = cls.org_payload
-            elif url == cls.org_payload['repos_url']:
+            elif url == cls.org_payload["repos_url"]:
                 mock_response.json.return_value = cls.repos_payload
             else:
                 mock_response.json.return_value = None
@@ -125,7 +124,6 @@ class TestIntegrationGithubOrgClient(TestCase):
         client = GithubOrgClient(self.org_payload["login"])
         repos = client.public_repos(license="apache-2.0")
         self.assertEqual(repos, self.apache2_repos)
-
 
 if __name__ == "__main__":
     unittest.main()
