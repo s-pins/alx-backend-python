@@ -42,14 +42,13 @@ class TestGithubOrgClient(unittest.TestCase):
 
         # Patch GithubOrgClient.org as a property
         with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock_org:
-            mock_org.return_value = mocked_payload
+            mock_org.return_value = mocked_org_payload
 
             client = GithubOrgClient("test")
             result = client._public_repos_url
 
             # Assert returned URL matches mocked payload
             self.assertEqual(result, mocked_payload["repos_url"])
-
 
 
 if __name__ == "__main__":
