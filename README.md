@@ -12,8 +12,7 @@ This repository contains a collection of backend-Python modules, exercises and m
 | `0x01-python-decorators`        | Decorators | Building and applying custom decorators, chaining decorators, introspection. |
 | `0x02-python-async-operations`  | Async / Contexts | Using `async`, `await`, context managers, and asynchronous design patterns. |
 | `0x03-unitests_and_integration_tests` | Testing | Writing unit tests, integration tests, mocking, and test-driven design. |
-
-> *Note: Folder names reflect the ALX module coding convention (`0x##-topic_name`).*  
+ 
 
 ---
 
