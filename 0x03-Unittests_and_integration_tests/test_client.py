@@ -141,7 +141,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
             return mock_response
 
-        cls.get_patcher = patch('utils.requests.get')
+        cls.get_patcher = patch('client.requests.get')
 
         mock_requests_get = cls.get_patcher.start()
         mock_requests_get.side_effect = requests_get_side_effect
