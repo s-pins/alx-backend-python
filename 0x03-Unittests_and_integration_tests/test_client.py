@@ -146,6 +146,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         mock_requests_get = cls.get_patcher.start()
         mock_requests_get.side_effect = requests_get_side_effect
 
+        cls.get_patcher = patcher
+
     @classmethod
     def tearDownClass(cls):
         """
