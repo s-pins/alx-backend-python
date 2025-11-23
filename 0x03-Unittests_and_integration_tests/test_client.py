@@ -100,7 +100,6 @@ class TestGithubOrgClient(unittest.TestCase):
             result
         )
 
-
 @parameterized_class(
     ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
     TEST_PAYLOAD
@@ -141,11 +140,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
             return mock_response
 
-        cls.get_patcher = patch('client.requests.get')
+        cls.get_patcher = patch('utils.requests.get')
 
-        mock_get = cls.get_patcher.start()
-        mock_get.side_effect = requests_get_side_effect
-
+        mock_requests_get = cls.get_patcher.start()
+        mock_requests_get.side_effect = requests_get_side_effect
 
     @classmethod
     def tearDownClass(cls):
