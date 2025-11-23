@@ -7,8 +7,12 @@ from django.utils import timezone
 class User(AbstractUser):
     """Custom user model extending AbstractUser"""
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(unique=True, null=False)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    first_name = models.CharField(max_length=30, null=False)
+    last_name = models.CharField(max_length=30, null=False)
+    email = models.EmailField(unique=True, db_index=True)  # indexed
+    password = models.CharField(max_length=128)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+
     
     ROLE_CHOICES = [
         ('guest', 'Guest'),
