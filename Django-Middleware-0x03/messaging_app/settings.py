@@ -51,6 +51,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "messaging_app.chats.middleware.RestrictAccessByTimeMiddleware",
+    "messaging_app.chats.middleware.RequestLoggingMiddleware",
+    "messaging_app.chats.middleware.OffensiveLanguageMiddleware",
+    "messaging_app.chats.middleware.RolePermissionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
