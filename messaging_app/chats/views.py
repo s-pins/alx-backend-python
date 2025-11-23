@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
@@ -38,9 +36,8 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation_id = self.kwargs["conversation_pk"]
-        conversation = get_object_or_404(Conversation, pk=conversation_id)
-        if self.request.user not in conversation.participants.all():
-            raise PermissionDenied("You are not a participant of this conversation.")
+        # The IsParticipantOfConversation permission class will handle the authorization for the conversation object.
+        # So we can just filter messages for the current conversation here.
         return Message.objects.filter(
             conversation_id=conversation_id
         ).order_by("sent_at")
