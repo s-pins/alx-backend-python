@@ -2,10 +2,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated # Reintroduce IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipantOfConversation
+from .filters import MessageFilter
+from .pagination import MessagePagination
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -32,9 +35,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
     permission_classes = [IsAuthenticated, IsParticipantOfConversation] # Add IsAuthenticated back
-
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["message_body"]
+    pagination_class = MessagePagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MessageFilter
 
     def get_queryset(self):
         conversation_id = self.kwargs["conversation_pk"]
