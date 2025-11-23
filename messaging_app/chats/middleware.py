@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.http import HttpResponseForbidden
 
 # Set up a logger
@@ -50,3 +50,41 @@ class RestrictAccessByTimeMiddleware:
         
         response = self.get_response(request)
         return response
+
+class OffensiveLanguageMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.requests_log = {}
+
+    def __call__(self, request):
+        ip_address = self.get_client_ip(request)
+
+        # Only track POST requests to message-related endpoints
+        if request.method == 'POST' and 'messages' in request.path:
+            now = datetime.now()
+            
+            # Clean up old records for the current IP
+            if ip_address in self.requests_log:
+                self.requests_log[ip_address] = [
+                    t for t in self.requests_log[ip_address] if now - t < timedelta(minutes=1)
+                ]
+
+            # Check if the user has exceeded the limit
+            if ip_address in self.requests_log and len(self.requests_log[ip_address]) >= 5:
+                return HttpResponseForbidden("You have sent too many messages. Please wait a moment.")
+
+            # Log the new request
+            if ip_address not in self.requests_log:
+                self.requests_log[ip_address] = []
+            self.requests_log[ip_address].append(now)
+
+        response = self.get_response(request)
+        return response
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
