@@ -1,14 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-
-# Task 4: Custom ORM Manager for Unread Messages
-class UnreadMessagesManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(read=False)
-
-    def unread_for_user(self, user):
-        return self.get_queryset().filter(receiver=user)
+from .managers import UnreadMessagesManager
 
 # Task 0, 1, 3, 4: Message Model
 class Message(models.Model):
@@ -19,6 +12,7 @@ class Message(models.Model):
     
     # Task 1: Field to track edits
     edited = models.BooleanField(default=False)
+    edited_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='edited_messages')
     
     # Task 3: Field for threaded conversations
     parent_message = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
@@ -47,6 +41,7 @@ class MessageHistory(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='history')
     old_content = models.TextField()
     edited_at = models.DateTimeField(auto_now_add=True)
+    edited_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='message_histories')
 
     class Meta:
         ordering = ['-edited_at']

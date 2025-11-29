@@ -1,12 +1,44 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 
 from .models import Message
+
+@login_required
+@require_POST
+def create_message(request):
+    """
+    Creates a new message from the logged-in user to a specified receiver.
+    This demonstrates setting the sender from the request user.
+    """
+    receiver_id = request.POST.get('receiver_id')
+    content = request.POST.get('content')
+    parent_id = request.POST.get('parent_message_id')
+
+    if not receiver_id or not content:
+        return HttpResponse("Receiver and content are required.", status=400)
+
+    receiver = get_object_or_404(User, pk=receiver_id)
+    parent_message = None
+    if parent_id:
+        parent_message = get_object_or_404(Message, pk=parent_id)
+
+    message = Message.objects.create(
+        sender=request.user,
+        receiver=receiver,
+        content=content,
+        parent_message=parent_message
+    )
+    # Redirect to the message thread, assuming parent_id exists for replies
+    # or a new conversation view for new messages.
+    redirect_to = parent_message.get_absolute_url() if parent_message else '#'
+    return redirect(redirect_to)
+
 
 # Task 2: View for Deleting a User Account
 @login_required
@@ -27,8 +59,9 @@ def message_thread(request, thread_id):
     """
     Displays a threaded conversation, optimizing queries using select_related and prefetch_related.
     """
-    # Get the top-level message in the thread
-    top_message = get_object_or_404(Message, pk=thread_id, parent_message__isnull=True)
+    # Get the top-level message in the thread, ensuring the user is part of the conversation
+    q_filter = Q(pk=thread_id, parent_message__isnull=True) & (Q(sender=request.user) | Q(receiver=request.user))
+    top_message = get_object_or_404(Message, q_filter)
 
     # Task 3: Use prefetch_related and select_related for optimization
     # Efficiently fetch the message and all its replies, along with sender/receiver details.
@@ -54,7 +87,10 @@ def inbox(request):
     """
     Displays a user's unread messages using the custom manager.
     """
-    unread_messages = Message.unread.unread_for_user(request.user).select_related('sender')
+    # Task 4: Optimize with .only() to retrieve only necessary fields.
+    unread_messages = Message.unread.unread_for_user(request.user).select_related('sender').only(
+        'id', 'content', 'timestamp', 'sender__username'
+    )
     
     # Mark messages as read once they are viewed
     # In a real app, this might be done via an AJAX call or when a specific thread is opened
