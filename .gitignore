@@ -1,0 +1,49 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# ---- Virtual environments ----
+env/
+venv/
+ENV/
+.venv/
+
+# ---- Django ----
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+static/
+
+# ---- Django Migrations (optional: keep if graded) ----
+# Uncomment if you do NOT want migrations tracked:
+# */migrations/
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Environment / Secrets ----
+.env
+*.env
+.env.local
+.env.*.local
