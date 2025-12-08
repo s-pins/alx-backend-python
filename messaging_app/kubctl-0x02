@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "Applying blue deployment..."
+kubectl apply -f blue_deployment.yaml
+
+echo "Applying green deployment..."
+kubectl apply -f green_deployment.yaml
+
+echo "Applying Kubernetes services..."
+kubectl apply -f kubeservice.yaml
+
+echo "Waiting for green deployment to be ready..."
+kubectl wait --for=condition=ready pod -l app=messaging-app-green --timeout=300s
+
+GREEN_POD_NAME=$(kubectl get pods -l app=messaging-app-green -o jsonpath='{.items[0].metadata.name}')
+
+if [ -z "$GREEN_POD_NAME" ]; then
+    echo "Error: Green pod not found."
+    exit 1
+fi
+
+echo "Checking logs for green pod: $GREEN_POD_NAME"
+kubectl logs "$GREEN_POD_NAME"
