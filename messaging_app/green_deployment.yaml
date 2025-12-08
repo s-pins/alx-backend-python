@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: messaging-app
-        image: my-django-app:2.0 # Assuming a new version for green deployment
+        image: my-django-app:2.0
         ports:
         - containerPort: 8000

@@ -19,16 +19,3 @@ spec:
         image: my-django-app:2.0 # Updated version for rolling update
         ports:
         - containerPort: 8000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: messaging-app-service
-spec:
-  selector:
-    app: messaging-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8000
-  type: ClusterIP
