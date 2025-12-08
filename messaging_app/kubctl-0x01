@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Scale the Django app deployment to 3 replicas
+echo "Scaling messaging-app-deployment to 3 replicas..."
+kubectl scale deployment/messaging-app-deployment --replicas=3
+
+# Verify that multiple pods are running
+echo "Verifying running pods..."
+kubectl get pods -l app=messaging-app
+
+# Perform load testing using wrk (assuming the service is accessible at http://localhost:80/)
+# In a real scenario, you would use the Ingress or NodePort IP/URL.
+echo "Performing load testing with wrk..."
+# Note: This command assumes 'wrk' is installed and the service is accessible.
+# You might need to adjust the URL based on your Kubernetes setup (e.g., Ingress URL).
+# For now, I'm using a placeholder.
+# Example: wrk -t2 -c10 -d30s http://localhost/
+echo "Please replace 'http://localhost' with the actual service URL or Ingress URL."
+wrk -t2 -c10 -d10s http://localhost:80
+
+# Monitor Resource Usage
+echo "Monitoring resource usage..."
+kubectl top pods -l app=messaging-app
