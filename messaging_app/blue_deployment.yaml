@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: messaging-app
-        image: my-django-app:latest # Replace with your actual Docker image name
+        image: my-django-app:2.0 # Updated version for rolling update
         ports:
         - containerPort: 8000
 ---
