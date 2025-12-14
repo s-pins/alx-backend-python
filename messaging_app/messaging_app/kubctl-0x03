@@ -1,0 +1,38 @@
+#!/bin/bash
+
+DEPLOYMENT_NAME="messaging-app-blue-deployment"
+INGRESS_HOST="your-domain.com" # Replace with your Ingress host
+INGRESS_PATH="/api"
+
+echo "Applying updated blue deployment (image version 2.0)..."
+kubectl apply -f blue_deployment.yaml
+
+echo "Monitoring rolling update progress for $DEPLOYMENT_NAME..."
+kubectl rollout status deployment/$DEPLOYMENT_NAME
+
+echo "Continuously testing the app with curl during rollout (sending requests every 0.5 seconds)..."
+echo "Press Ctrl+C to stop testing."
+
+# In a real scenario, you'd want to run this in the background and check for failures.
+# For demonstration, we'll just show continuous requests.
+while true; do
+  STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://$INGRESS_HOST$INGRESS_PATH)
+  if [ "$STATUS_CODE" -eq 200 ]; then
+    echo "$(date): App is accessible (HTTP 200 OK)."
+  else
+    echo "$(date): App returned HTTP $STATUS_CODE. Potential downtime!"
+  fi
+  sleep 0.5
+done & # Run in background
+
+CURL_PID=$! # Store the PID of the curl loop
+
+echo "Waiting for user to stop curl testing (Ctrl+C to stop curl, then press Enter to continue script)..."
+read -r -d '' _ </dev/tty # Wait for Enter key after Ctrl+C for background process
+
+# Kill the background curl process
+kill "$CURL_PID" 2>/dev/null
+
+
+echo "Verifying the Rolling Update is Complete by checking current pods..."
+kubectl get pods -l app=messaging-app-blue
