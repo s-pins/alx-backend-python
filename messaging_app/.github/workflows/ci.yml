@@ -1,0 +1,83 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: 'test_db'
+          MYSQL_USER: 'test_user'
+          MYSQL_PASSWORD: 'test_password'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-django flake8 pytest-cov
+
+    - name: Wait for MySQL to be ready
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-client
+        for i in `seq 1 10`; do
+          mysql -h mysql -u root -e "status" && break
+          sleep 5
+        done
+
+    - name: Run migrations
+      env:
+        MYSQL_DB: test_db
+        MYSQL_USER: test_user
+        MYSQL_PASSWORD: test_password
+        MYSQL_HOST: mysql
+        DJANGO_SETTINGS_MODULE: messaging_app.settings
+      run: python manage.py migrate
+
+    - name: Run Flake8 Linting
+      run: flake8 .
+
+    - name: Run tests and generate coverage report
+      env:
+        MYSQL_DB: test_db
+        MYSQL_USER: test_user
+        MYSQL_PASSWORD: test_password
+        MYSQL_HOST: mysql
+        DJANGO_SETTINGS_MODULE: messaging_app.settings
+      run: pytest --cov=. --cov-report=xml --junitxml=test-results.xml
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: coverage.xml
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: test-results.xml
