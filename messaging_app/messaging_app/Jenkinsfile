@@ -12,8 +12,8 @@ pipeline {
         DJANGO_SETTINGS_MODULE = 'messaging_app.settings'
         // Docker Hub credentials and repository name
         DOCKER_HUB_CREDENTIALS_ID = 'docker-hub-credentials' // Jenkins credentials ID for Docker Hub
-        DOCKER_HUB_USERNAME = 'your_docker_hub_username' // Replace with your Docker Hub username
-        DOCKER_HUB_REPO = 'your_docker_hub_repo' // Replace with your Docker Hub repository name
+        DOCKER_HUB_USERNAME = 'neon_pulse' // Replace with real Docker Hub username
+        DOCKER_HUB_REPO = 'messaging_app' // Replace with real Docker Hub repository name
     }
     stages {
         stage('Checkout') {
